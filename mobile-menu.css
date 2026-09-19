@@ -1,6 +1,10 @@
 /* Olir mobile navigation */
 .mobile-menu{display:none}
+/* Keep the hero clean across every screen size. */
+.hero-stamp,.hero-copy:before,.hero-copy:after{display:none!important}
 @media(max-width:720px){
+  .hero-copy{background:linear-gradient(145deg,#e9e1ce 0%,#d8ddca 100%)}
+  .hero-image{background-position:center 27%}
   body.menu-open{overflow:hidden}
   .header-actions{gap:12px}
   .header-cta{font-size:9px}

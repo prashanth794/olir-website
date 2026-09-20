@@ -24,6 +24,11 @@ const ingredients = [
 
 export const pages = [
   {
+    slug: '404', title: 'A little detour — Olir', noindex: true,
+    description: 'Find your way back to Olir botanical hair care.',
+    body: `<section class="success-page"><p class="eyebrow">404 / A little detour</p><h1>Let’s get you<br><em>back to your ritual.</em></h1><p>We couldn’t find this page. Discover our first hair oil or send us a note if you need a hand.</p><a href="index.html" class="button">Back to Olir ${arrow}</a><a href="contact.html" class="text-link">Contact us</a></section>`,
+  },
+  {
     slug: 'index', title: 'Olir — Botanical hair care. A little space for you.',
     description: 'Meet Olir, a botanical hair oil in development for your everyday ritual. Discover the ingredients and join the first-release list.',
     body: `<section class="hero"><div class="hero-copy"><p class="eyebrow">Botanical hair care · Coming soon</p><h1>A little ritual.<br>A deeper kind<br>of <em>care.</em></h1><p>From scalp to strands, a moment that belongs to you. Meet the first hair oil from Olir.</p><div class="hero-actions"><a class="button button-light" href="product.html">Discover the hair oil ${arrow}</a><a class="quiet-link" href="#waitlist">Join the first release</a></div><span class="hero-footnote">Rooted in nature. Made for your everyday.</span></div><div class="hero-art">${hair('hero-photo',true)}<span class="image-caption">The everyday, a little more unhurried.</span></div></section>

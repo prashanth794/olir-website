@@ -10,8 +10,8 @@ for (const file of htmlFiles) {
   const source = readFileSync(join(root, file), 'utf8');
   for (const match of source.matchAll(/(?:href|src)="([^"]+)"/g)) {
     const reference = match[1];
-    if (/^(https?:|mailto:|#|\/)/.test(reference)) continue;
-    const localPath = join(root, reference.split(/[?#]/)[0]);
+    if (/^(https?:|mailto:|#)/.test(reference)) continue;
+    const localPath = join(root, reference.split(/[?#]/)[0].replace(/^\//, ''));
     if (!existsSync(localPath)) errors.push(`${file}: missing local reference ${reference}`);
   }
   if (!source.includes('lang="en-AU"')) errors.push(`${file}: missing Australian language tag`);
@@ -25,10 +25,15 @@ for (const file of htmlFiles) {
   }
 }
 
-if (htmlFiles.length !== 11) errors.push(`Expected 11 pages, found ${htmlFiles.length}`);
+if (htmlFiles.length !== 12) errors.push(`Expected 12 pages, found ${htmlFiles.length}`);
 for (const required of ['design.css', 'script.js', 'favicon.svg', '_headers', 'robots.txt', 'sitemap.xml']) {
   if (!existsSync(join(root, required))) errors.push(`Missing publish file ${required}`);
 }
+const headers = readFileSync(join(root, '_headers'), 'utf8');
+for (const required of ['Content-Security-Policy:', "form-action 'self'", "frame-ancestors 'none'", 'X-Frame-Options: DENY', 'X-Content-Type-Options: nosniff', 'Permissions-Policy:', 'Strict-Transport-Security: max-age=31536000']) {
+  if (!headers.includes(required)) errors.push(`Missing security policy: ${required}`);
+}
+if (preview !== headers.includes('X-Robots-Tag: noindex, nofollow')) errors.push('Incorrect environment indexing policy');
 for (const forbidden of ['.git', '.github', 'scripts', 'README.md', 'netlify.toml', 'OLIR-LINKS.md']) {
   if (existsSync(join(root, forbidden))) errors.push(`Internal file exposed: ${forbidden}`);
 }

@@ -2,12 +2,13 @@ import { mkdirSync, writeFileSync, copyFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pages } from './site-pages.mjs';
+import { securityHeaders } from './security-policy.mjs';
 
 // A single shared shell keeps every page consistent. No runtime dependencies.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const out = resolve(root, 'dist');
 const preview = process.env.CONTEXT ? process.env.CONTEXT !== 'production' : process.argv.includes('--preview');
-const version = 'olir-20260919-02';
+const version = 'olir-20260920-03';
 const primary = [['product', 'Hair oil'], ['ingredients', 'Ingredients'], ['about', 'Our story']];
 const support = [['ritual', 'The ritual'], ['faq', 'FAQs'], ['contact', 'Contact'], ['shipping-returns', 'Shipping & returns'], ['privacy', 'Privacy']];
 const link = ([slug, label], current) => `<a href="${slug}.html"${slug === current ? ' aria-current="page"' : ''}>${label}</a>`;
@@ -37,7 +38,7 @@ function document(page, isPreview) {
     // Preview forms cannot add test entries to the live waitlist/contact inbox.
     content = content.replace(/ data-netlify="true"/g, '').replace(/<form\b([^>]*)>/g, '<form$1 data-preview-form="true"><p class="preview-form-note">Preview mode — submissions are disabled. <a href="https://olir.com.au/">Visit the live site</a>.</p><fieldset disabled>').replace(/<\/form>/g, '</fieldset></form>');
   }
-  return `<!doctype html>
+  const html = `<!doctype html>
 <html lang="en-AU">
 <head>
   <meta charset="utf-8">
@@ -50,6 +51,9 @@ function document(page, isPreview) {
   <meta property="og:description" content="${page.description}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="${canonical}">
+  <meta property="og:image" content="https://olir.com.au/assets/olir-bottle.webp">
+  <meta property="og:image:alt" content="The Olir sample hair oil bottle, styled with botanicals">
+  <meta name="twitter:card" content="summary_large_image">
   ${isPreview || page.noindex ? '<meta name="robots" content="noindex, nofollow">' : ''}
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,6 +70,8 @@ ${footer(slug)}
 </body>
 </html>
 `;
+  // A 404 can be served at any nested URL; its local links must resolve from root.
+  return slug === '404' ? html.replace(/\b(href|src|srcset)="(?!https?:|#|\/)([^"]+)"/g, '$1="/$2"') : html;
 }
 
 mkdirSync(resolve(out, 'assets'), { recursive: true });
@@ -77,7 +83,7 @@ for (const file of ['design.css', 'script.js', 'favicon.svg', 'assets/olir-hair.
   if (!existsSync(resolve(root, file))) throw new Error(`Missing publish asset: ${file}`);
   copyFileSync(resolve(root, file), resolve(out, file));
 }
-writeFileSync(resolve(out, '_headers'), `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  X-Frame-Options: SAMEORIGIN\n${preview ? '  X-Robots-Tag: noindex, nofollow\n' : ''}\n/assets/*\n  Cache-Control: public, max-age=86400\n`);
+writeFileSync(resolve(out, '_headers'), securityHeaders(preview) + '\n/assets/*\n  Cache-Control: public, max-age=86400\n');
 writeFileSync(resolve(out, 'robots.txt'), preview ? 'User-agent: *\nDisallow: /\n' : 'User-agent: *\nAllow: /\nSitemap: https://olir.com.au/sitemap.xml\n');
 writeFileSync(resolve(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pages.filter(p=>!p.noindex).map(p=>`<url><loc>https://olir.com.au/${p.slug==='index'?'':p.slug}</loc></url>`).join('')}</urlset>`);
 console.log(`Built ${pages.length} pages for ${preview ? 'preview (forms disabled, noindex)' : 'production'}. Publish directory: dist/`);

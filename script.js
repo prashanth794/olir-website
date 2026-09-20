@@ -1,43 +1,102 @@
-// Waitlist submissions are handled by Netlify Forms after the next deployment.
-// Shared mobile navigation for every Olir page.
+// Forms submit directly to Netlify; navigation never intercepts submissions.
 document.addEventListener('DOMContentLoaded', () => {
-  const header = document.querySelector('header');
-  const primaryNav = header?.querySelector('nav');
-  if (!header || !primaryNav) return;
+  const menuButton = document.querySelector('.menu-toggle');
+  const menu = document.querySelector('dialog#site-menu');
 
-  primaryNav.id ||= 'olir-primary-navigation';
-  primaryNav.setAttribute('aria-label', 'Primary navigation');
-  let menuButton = header.querySelector('.menu');
-  if (!menuButton) {
-    menuButton = document.createElement('button');
-    menuButton.className = 'menu';
-    header.querySelector('.header-actions')?.append(menuButton);
-  }
+  if (!menuButton || !menu || typeof menu.showModal !== 'function') return;
+
+  const desktop = window.matchMedia('(min-width: 1000px)');
+  let previousFocus = null;
+  let previousOverflow = '';
+  let previousOverflowPriority = '';
+  let scrollLocked = false;
+
   menuButton.type = 'button';
-  menuButton.setAttribute('aria-expanded', 'false');
-  menuButton.setAttribute('aria-controls', 'olir-mobile-menu');
-  menuButton.setAttribute('aria-label', 'Open menu');
-  menuButton.innerHTML = '<span></span><span></span>';
+  menuButton.setAttribute('aria-controls', menu.id);
+  menu.querySelectorAll('[data-close-menu]').forEach((button) => {
+    if (button instanceof HTMLButtonElement) button.type = 'button';
+  });
 
-  const panel = document.createElement('aside');
-  panel.id = 'olir-mobile-menu';
-  panel.className = 'mobile-menu';
-  panel.setAttribute('aria-hidden', 'true');
-  panel.innerHTML = `
-    <div class="mobile-menu__top"><span>Olir navigation</span><button type="button" class="mobile-menu__close" aria-label="Close menu">×</button></div>
-    <nav aria-label="Mobile navigation">${primaryNav.innerHTML}</nav>
-    <div class="mobile-menu__support"><a href="faq.html">FAQs</a><a href="contact.html">Contact</a><a href="shipping-returns.html">Shipping &amp; returns</a><a href="privacy.html">Privacy</a></div>
-    <a class="button" href="product.html#waitlist">Join the first release <span>→</span></a>`;
-  document.body.append(panel);
-
-  const setMenu = (open) => {
-    document.body.classList.toggle('menu-open', open);
+  const updateButton = (open) => {
     menuButton.setAttribute('aria-expanded', String(open));
     menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-    panel.setAttribute('aria-hidden', String(!open));
   };
-  menuButton.addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
-  panel.querySelector('.mobile-menu__close').addEventListener('click', () => setMenu(false));
-  panel.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setMenu(false)));
-  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') setMenu(false); });
+
+  const unlockScroll = () => {
+    if (!scrollLocked) return;
+    if (previousOverflow) {
+      document.body.style.setProperty('overflow', previousOverflow, previousOverflowPriority);
+    } else {
+      document.body.style.removeProperty('overflow');
+    }
+    document.body.classList.remove('menu-open');
+    scrollLocked = false;
+  };
+
+  const closeMenu = () => {
+    if (menu.open) menu.close();
+    updateButton(false);
+    unlockScroll();
+  };
+
+  const openMenu = () => {
+    if (menu.open || desktop.matches) return;
+    previousFocus = document.activeElement;
+    previousOverflow = document.body.style.getPropertyValue('overflow');
+    previousOverflowPriority = document.body.style.getPropertyPriority('overflow');
+    menu.showModal();
+    document.body.style.setProperty('overflow', 'hidden');
+    document.body.classList.add('menu-open');
+    scrollLocked = true;
+    updateButton(true);
+    // The browser traps focus inside a modal dialog and makes the page inert.
+    menu.querySelector('[data-close-menu]')?.focus({ preventScroll: true });
+  };
+
+  menuButton.addEventListener('click', () => {
+    if (menu.open) closeMenu();
+    else openMenu();
+  });
+
+  menu.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    if (event.target.closest('[data-close-menu], a[href]')) {
+      closeMenu();
+      return;
+    }
+
+    // A backdrop click targets the dialog, but empty space inside it does too.
+    if (event.target === menu) {
+      const bounds = menu.getBoundingClientRect();
+      const outside = event.clientX < bounds.left || event.clientX > bounds.right
+        || event.clientY < bounds.top || event.clientY > bounds.bottom;
+      if (outside) closeMenu();
+    }
+  });
+
+  // Escape uses the dialog's native cancel behaviour; all dismissal paths clean up.
+  menu.addEventListener('close', () => {
+    updateButton(false);
+    unlockScroll();
+    if (previousFocus instanceof HTMLElement && previousFocus.isConnected
+      && previousFocus.getClientRects().length > 0
+      && (document.activeElement === document.body || menu.contains(document.activeElement))) {
+      previousFocus.focus({ preventScroll: true });
+    }
+    previousFocus = null;
+  });
+
+  desktop.addEventListener('change', (event) => {
+    if (event.matches) closeMenu();
+  });
+
+  // A restored back/forward-cache page should never retain a stale scroll lock.
+  window.addEventListener('pageshow', () => {
+    if (!menu.open) {
+      updateButton(false);
+      unlockScroll();
+    } else if (desktop.matches) {
+      closeMenu();
+    }
+  });
 });

@@ -8,7 +8,7 @@ import { securityHeaders } from './security-policy.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const out = resolve(root, 'dist');
 const preview = process.env.CONTEXT ? process.env.CONTEXT !== 'production' : process.argv.includes('--preview');
-const version = 'olir-20260920-03';
+const version = 'olir-20260920-04';
 const primary = [['product', 'Hair oil'], ['ingredients', 'Ingredients'], ['about', 'Our story']];
 const support = [['ritual', 'The ritual'], ['faq', 'FAQs'], ['contact', 'Contact'], ['shipping-returns', 'Shipping & returns'], ['privacy', 'Privacy']];
 const link = ([slug, label], current) => `<a href="${slug}.html"${slug === current ? ' aria-current="page"' : ''}>${label}</a>`;
@@ -83,7 +83,7 @@ for (const page of pages) {
   writeFileSync(resolve(root, `${page.slug}.html`), document(page, false));
   writeFileSync(resolve(out, `${page.slug}.html`), document(page, preview));
 }
-for (const file of ['design.css', 'script.js', 'favicon.svg', 'assets/olir-hair.webp', 'assets/olir-hair-mobile.webp', 'assets/olir-bottle.webp']) {
+for (const file of ['design.css', 'script.js', 'favicon.svg', 'assets/olir-hair.webp', 'assets/olir-hair-mobile.webp', 'assets/olir-bottle.webp', 'assets/olir-mortar-ritual.webp', 'assets/olir-mortar-ritual-mobile.webp', 'assets/olir-botanical-nature.webp', 'assets/olir-botanical-nature-mobile.webp']) {
   if (!existsSync(resolve(root, file))) throw new Error(`Missing publish asset: ${file}`);
   copyFileSync(resolve(root, file), resolve(out, file));
 }

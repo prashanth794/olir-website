@@ -193,6 +193,11 @@ section[id], article[id] { scroll-margin-top: 112px; }
 .page-intro h1 { margin-top: 27px; font-size: clamp(50px, 5.8vw, 82px); }
 .intro-text { max-width: 510px; margin-top: 29px; color: var(--muted); font-size: 14px; }
 .ingredient-story { display: grid; grid-template-columns: 1fr 1.1fr; gap: 13%; align-items: start; }
+.ingredient-visual { display: grid; grid-template-columns: 1.25fr .75fr; align-items: center; gap: 8%; padding: 0 var(--gutter) 78px; background: var(--sage); border-bottom: 1px solid var(--line); }
+.ingredient-photo { display: block; min-height: 430px; overflow: hidden; background: #dbe3d3; }
+.ingredient-photo img { width: 100%; height: 100%; min-height: 430px; object-fit: cover; object-position: center; }
+.ingredient-visual h2 { margin: 21px 0 17px; font-size: clamp(34px, 3.8vw, 54px); }
+.ingredient-visual p:not(.eyebrow) { max-width: 330px; color: var(--muted); font-size: 14px; }
 .ingredient-story-intro h2 { margin-top: 22px; }
 .ingredient-story-intro > p:not(.eyebrow) { max-width: 390px; margin-top: 25px; font-size: 14px; color: var(--muted); }
 .ingredient-story-intro .text-link { margin-top: 25px; }
@@ -233,6 +238,7 @@ section[id], article[id] { scroll-margin-top: 112px; }
 .wide-photo { padding: 0 var(--gutter); }
 .wide-photo picture, .wide-photo img { width: 100%; }
 .wide-photo img { height: 520px; object-fit: cover; object-position: 50% 44%; }
+.botanical-wide img { object-position: center; }
 .values-section .section-heading { align-items: flex-start; justify-content: flex-start; gap: 8%; }
 .values-section .section-heading > .eyebrow { flex: 0 0 25%; margin-top: 9px; }
 .values-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 50px; margin-top: 58px; }
@@ -344,6 +350,8 @@ section[id], article[id] { scroll-margin-top: 112px; }
   .product-detail .product-frame img { height: 580px; }
   .release-card { padding: 21px; }
   .release-card .button { gap: 16px; font-size: 12px; padding: 13px 15px; }
+  .ingredient-visual { gap: 6%; padding-bottom: 62px; }
+  .ingredient-photo, .ingredient-photo img { min-height: 380px; }
   .ingredient-story { gap: 8%; }
   .ingredient-rows article { gap: 14px; grid-template-columns: 25px 1fr; }
   .note-band { grid-template-columns: .7fr 1.4fr; gap: 24px 35px; }
@@ -464,6 +472,11 @@ section[id], article[id] { scroll-margin-top: 112px; }
   .page-intro { padding: 48px var(--gutter) 52px; }
   .page-intro h1 { margin-top: 24px; font-size: clamp(43px, 11.2vw, 62px); line-height: 1.15; }
   .intro-text { font-size: 13px; max-width: 410px; margin-top: 24px; }
+  .ingredient-visual { grid-template-columns: 1fr; gap: 31px; padding: 0 0 50px; }
+  .ingredient-visual > div { padding: 0 var(--gutter); }
+  .ingredient-photo, .ingredient-photo img { min-height: 0; height: 88vw; max-height: 520px; }
+  .ingredient-visual h2 { font-size: 39px; }
+  .ingredient-visual p:not(.eyebrow) { font-size: 13px; }
   .ingredient-story { grid-template-columns: 1fr; gap: 38px; }
   .ingredient-story-intro > p:not(.eyebrow) { font-size: 13px; }
   .ingredient-rows article { padding: 28px 0; gap: 19px; grid-template-columns: 25px 1fr; }

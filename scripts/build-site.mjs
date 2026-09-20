@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync, copyFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, copyFileSync, existsSync, lstatSync, rmSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pages } from './site-pages.mjs';
@@ -74,6 +74,10 @@ ${footer(slug)}
   return slug === '404' ? html.replace(/\b(href|src|srcset)="(?!https?:|#|\/)([^"]+)"/g, '$1="/$2"') : html;
 }
 
+// dist is disposable build output. Never publish stale cache files or metadata.
+// Refuse a symlink so cleaning this exact generated directory cannot follow one.
+if (existsSync(out) && lstatSync(out).isSymbolicLink()) throw new Error('Publish directory must not be a symlink');
+rmSync(out, { recursive: true, force: true });
 mkdirSync(resolve(out, 'assets'), { recursive: true });
 for (const page of pages) {
   writeFileSync(resolve(root, `${page.slug}.html`), document(page, false));

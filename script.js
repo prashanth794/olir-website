@@ -129,11 +129,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // --- Scroll Reveal Animations ---
+  // --- Dynamic Interactions & Animations ---
+
+  // 1. Staggered Scroll Reveals
+  // Automatically add reveal classes to typography and media to animate them individually
+  const revealElements = document.querySelectorAll('main h1, main h2, main h3, main p, main img, main .button, main .text-link');
+  revealElements.forEach(el => el.classList.add('reveal'));
+
   const observerOptions = {
     root: null,
-    rootMargin: '0px',
-    threshold: 0.15
+    rootMargin: '0px 0px -10% 0px', // Trigger slightly before it comes into view
+    threshold: 0
   };
   const observer = new IntersectionObserver((entries, obs) => {
     entries.forEach(entry => {
@@ -143,6 +149,37 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }, observerOptions);
+  
+  revealElements.forEach(el => observer.observe(el));
 
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  // 2. Header Scroll Effect (Shrink & Blur)
+  const header = document.querySelector('.site-header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      header.classList.add('header-scrolled');
+    } else {
+      header.classList.remove('header-scrolled');
+    }
+  }, { passive: true });
+
+  // 3. Parallax Images
+  const parallaxImages = document.querySelectorAll('.hero-photo img, .wide-photo img, .ingredient-photo img, .story-hero-photo img');
+  parallaxImages.forEach(img => {
+    // Wrap image for parallax overflow if not already
+    img.style.transform = 'scale(1.1)'; // allow room to scroll
+  });
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    parallaxImages.forEach(img => {
+      const parent = img.closest('figure, div');
+      if (!parent) return;
+      const rect = parent.getBoundingClientRect();
+      // Only animate if in viewport
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        const yPos = (rect.top * 0.15); // Adjust speed factor here
+        img.style.transform = `scale(1.15) translateY(${yPos}px)`;
+      }
+    });
+  }, { passive: true });
 });

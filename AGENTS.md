@@ -6,4 +6,3 @@
 - **One task per tool**: Finish, test, and push a specific task or PR in one tool rather than editing the same branch across multiple tools simultaneously.
 - **Browser**: Always use Google Chrome for all web interactions and audits, not Safari.
 - **Financial Restriction**: NEVER make payments, use or enter credit/debit card details, purchase services, upgrade plans, or enable chargeable services.
-- **Deploys**: Be mindful of Netlify deployment credit restrictions; perform local validation before committing and pushing.

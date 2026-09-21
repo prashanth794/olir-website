@@ -18,10 +18,7 @@ for (const file of htmlFiles) {
   if ((source.match(/<h1\b/g) || []).length !== 1) errors.push(`${file}: expected exactly one h1`);
   if (preview && !source.includes('noindex, nofollow')) errors.push(`${file}: preview must not be indexed`);
   for (const form of source.matchAll(/<form\b[\s\S]*?<\/form>/g)) {
-    if (!form[0].includes('name="form-name"')) errors.push(`${file}: form name missing`);
     if (!form[0].includes('name="bot-field"')) errors.push(`${file}: spam honeypot missing`);
-    if (preview && (!form[0].includes('<fieldset disabled>') || form[0].includes('data-netlify="true"'))) errors.push(`${file}: preview form not isolated`);
-    if (!preview && !form[0].includes('data-netlify="true"')) errors.push(`${file}: production form not registered`);
   }
 }
 
@@ -30,7 +27,7 @@ for (const required of ['design.css', 'script.js', 'favicon.svg', '_headers', 'r
   if (!existsSync(join(root, required))) errors.push(`Missing publish file ${required}`);
 }
 const headers = readFileSync(join(root, '_headers'), 'utf8');
-for (const required of ['Content-Security-Policy:', "form-action 'self'", "frame-ancestors 'none'", 'X-Frame-Options: DENY', 'X-Content-Type-Options: nosniff', 'Permissions-Policy:', 'Strict-Transport-Security: max-age=31536000']) {
+for (const required of ['Content-Security-Policy:', "form-action 'self' https://formspree.io", "frame-ancestors 'none'", 'X-Frame-Options: DENY', 'X-Content-Type-Options: nosniff', 'Permissions-Policy:', 'Strict-Transport-Security: max-age=31536000']) {
   if (!headers.includes(required)) errors.push(`Missing security policy: ${required}`);
 }
 if (preview !== headers.includes('X-Robots-Tag: noindex, nofollow')) errors.push('Incorrect environment indexing policy');
@@ -40,7 +37,7 @@ for (const forbidden of ['.git', '.github', 'scripts', 'README.md', 'netlify.tom
 
 for (const formName of ['olir-waitlist', 'olir-contact']) {
   const found = htmlFiles.some((file) => readFileSync(join(root, file), 'utf8').includes(`name="${formName}"`));
-  if (!found) errors.push(`Missing ${formName} Netlify form`);
+  if (!found) errors.push(`Missing ${formName} Formspree form`);
 }
 
 if (errors.length) {

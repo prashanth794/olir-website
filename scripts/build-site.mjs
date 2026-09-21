@@ -130,3 +130,4 @@ writeFileSync(resolve(out, '_headers'), securityHeaders(preview) + '\n/assets/*\
 writeFileSync(resolve(out, 'robots.txt'), preview ? 'User-agent: *\nDisallow: /\n' : 'User-agent: *\nAllow: /\nSitemap: https://olir.com.au/sitemap.xml\n');
 writeFileSync(resolve(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pages.filter(p=>!p.noindex).map(p=>`<url><loc>https://olir.com.au/${p.slug==='index'?'':p.slug}</loc></url>`).join('')}</urlset>`);
 console.log(`Built ${pages.length} pages for ${preview ? 'preview (forms disabled, noindex)' : 'production'}. Publish directory: dist/`);
+writeFileSync(resolve(out, 'CNAME'), 'olir.com.au');

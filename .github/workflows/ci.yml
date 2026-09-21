@@ -3,7 +3,7 @@ name: Website checks
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, staging]
 
 permissions:
   contents: read
@@ -19,5 +19,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Validate pages, links, assets and forms
-        run: node scripts/validate-site.mjs
+      - name: Build and validate production
+        run: node scripts/build-site.mjs && node scripts/validate-site.mjs
+      - name: Build and validate isolated preview
+        run: |
+          node -e "require('fs').copyFileSync('netlify.toml', 'dist/netlify.toml')"
+          node scripts/build-site.mjs --preview
+          node scripts/validate-site.mjs --preview

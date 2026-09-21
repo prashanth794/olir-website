@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync, copyFileSync, existsSync, lstatSync, rmSync } from 'node:fs';
+import { mkdirSync, writeFileSync, copyFileSync, existsSync, lstatSync, rmSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pages } from './site-pages.mjs';
@@ -57,10 +57,39 @@ function document(page, isPreview) {
   <meta name="twitter:card" content="summary_large_image">
   ${isPreview || page.noindex ? '<meta name="robots" content="noindex, nofollow">' : ''}
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="design.css?v=${version}">
+  ${slug === 'index' ? `<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Olir",
+    "url": "https://olir.com.au/",
+    "logo": "https://olir.com.au/favicon.svg"
+  }
+  </script>` : ''}
+  ${slug === 'faq' ? `<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type": "Question", "name": "When can I buy Olir?", "acceptedAnswer": {"@type": "Answer", "text": "Our first hair oil is in development. Join the waitlist for the launch date, size, price and release details as they are confirmed."}},
+      {"@type": "Question", "name": "What is in the hair oil?", "acceptedAnswer": {"@type": "Answer", "text": "Rosemary, tea tree oil, aloe vera essence and olive oil are the four key ingredients in our current sample. We will share the complete ingredient list before launch."}},
+      {"@type": "Question", "name": "Is joining the waitlist a pre-order?", "acceptedAnswer": {"@type": "Answer", "text": "No. Joining is free and does not reserve a bottle, place an order or take a payment. It simply keeps you in the loop."}}
+    ]
+  }
+  </script>` : ''}
+  ${primary.find(p => p[0] === slug) || support.find(p => p[0] === slug) ? `<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [{
+      "@type": "ListItem", "position": 1, "name": "Home", "item": "https://olir.com.au/"
+    },{
+      "@type": "ListItem", "position": 2, "name": "${page.title.split('—')[0].trim()}", "item": "${canonical}"
+    }]
+  }
+  </script>` : ''}
   <script src="script.js?v=${version}" defer></script>
 </head>
 <body class="page-${slug}${isPreview ? ' is-preview' : ''}">
@@ -87,6 +116,15 @@ for (const page of pages) {
 for (const file of ['design.css', 'script.js', 'favicon.svg', 'assets/olir-hair.webp', 'assets/olir-hair-mobile.webp', 'assets/olir-bottle.webp', 'assets/olir-mortar-ritual.webp', 'assets/olir-mortar-ritual-mobile.webp', 'assets/olir-botanical-nature.webp', 'assets/olir-botanical-nature-mobile.webp']) {
   if (!existsSync(resolve(root, file))) throw new Error(`Missing publish asset: ${file}`);
   copyFileSync(resolve(root, file), resolve(out, file));
+}
+if (existsSync(resolve(root, 'apple-touch-icon.png'))) copyFileSync(resolve(root, 'apple-touch-icon.png'), resolve(out, 'apple-touch-icon.png'));
+if (existsSync(resolve(root, 'manifest.webmanifest'))) copyFileSync(resolve(root, 'manifest.webmanifest'), resolve(out, 'manifest.webmanifest'));
+const fontsDir = resolve(root, 'assets', 'fonts');
+if (existsSync(fontsDir)) {
+  mkdirSync(resolve(out, 'assets', 'fonts'), { recursive: true });
+  for (const font of readdirSync(fontsDir)) {
+    if (font.endsWith('.woff2')) copyFileSync(resolve(fontsDir, font), resolve(out, 'assets', 'fonts', font));
+  }
 }
 writeFileSync(resolve(out, '_headers'), securityHeaders(preview) + '\n/assets/*\n  Cache-Control: public, max-age=86400\n');
 writeFileSync(resolve(out, 'robots.txt'), preview ? 'User-agent: *\nDisallow: /\n' : 'User-agent: *\nAllow: /\nSitemap: https://olir.com.au/sitemap.xml\n');

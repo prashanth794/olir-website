@@ -99,8 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- Asynchronous Form Submission ---
-  document.querySelectorAll('form[data-netlify="true"]').forEach(form => {
+  // --- Asynchronous Form Submission (Formspree) ---
+  document.querySelectorAll('form.ajax-form').forEach(form => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitButton = form.querySelector('button[type="submit"]');
@@ -110,13 +110,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       try {
         const formData = new FormData(form);
-        const res = await fetch('/', {
+        const actionUrl = form.getAttribute('action');
+        
+        // Prevent accidental submission to the placeholder
+        if (actionUrl.includes('YOUR_FORM_ID')) {
+           alert('Please replace YOUR_FORM_ID in scripts/site-pages.mjs with your actual Formspree ID.');
+           throw new Error('Placeholder Formspree ID detected.');
+        }
+
+        const res = await fetch(actionUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(formData).toString()
+          headers: { 'Accept': 'application/json' },
+          body: formData
         });
+        
         if (res.ok) {
-          form.innerHTML = '<div class="form-success"><p class="eyebrow">Thank you</p><p>You’re on the list. We’ll be in touch soon.</p></div>';
+          form.innerHTML = '<div class="form-success reveal is-visible"><p class="eyebrow">Thank you</p><p>You’re on the list. We’ll be in touch soon.</p></div>';
         } else {
           throw new Error('Network response was not ok');
         }

@@ -52,7 +52,7 @@ function document(page, isPreview) {
   <meta property="og:description" content="${page.description}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="${canonical}">
-  <meta property="og:image" content="https://olir.com.au/assets/olir-bottle.webp">
+  <meta property="og:image" content="https://olir.com.au/assets/olir-bottle.jpg">
   <meta property="og:image:alt" content="The Olir sample hair oil bottle, styled with botanicals">
   <meta name="twitter:card" content="summary_large_image">
   ${isPreview || page.noindex ? '<meta name="robots" content="noindex, nofollow">' : ''}
@@ -113,10 +113,18 @@ for (const page of pages) {
   writeFileSync(resolve(root, `${page.slug}.html`), document(page, false));
   writeFileSync(resolve(out, `${page.slug}.html`), document(page, preview));
 }
-for (const file of ['design.css', 'script.js', 'favicon.svg', 'assets/olir-hair.webp', 'assets/olir-hair-mobile.webp', 'assets/olir-bottle.webp', 'assets/olir-mortar-ritual.webp', 'assets/olir-mortar-ritual-mobile.webp', 'assets/olir-botanical-nature.webp', 'assets/olir-botanical-nature-mobile.webp']) {
+for (const file of ['design.css', 'script.js', 'favicon.svg']) {
   if (!existsSync(resolve(root, file))) throw new Error(`Missing publish asset: ${file}`);
   copyFileSync(resolve(root, file), resolve(out, file));
 }
+const cpdir = (src, dest) => {
+  mkdirSync(dest, { recursive: true });
+  for (const item of readdirSync(src, { withFileTypes: true })) {
+    if (item.isDirectory()) cpdir(resolve(src, item.name), resolve(dest, item.name));
+    else copyFileSync(resolve(src, item.name), resolve(dest, item.name));
+  }
+};
+cpdir(resolve(root, 'assets'), resolve(out, 'assets'));
 if (existsSync(resolve(root, 'apple-touch-icon.png'))) copyFileSync(resolve(root, 'apple-touch-icon.png'), resolve(out, 'apple-touch-icon.png'));
 if (existsSync(resolve(root, 'manifest.webmanifest'))) copyFileSync(resolve(root, 'manifest.webmanifest'), resolve(out, 'manifest.webmanifest'));
 const fontsDir = resolve(root, 'assets', 'fonts');

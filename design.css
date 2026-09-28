@@ -953,4 +953,33 @@ details[open]::details-content {
   .reveal { opacity: 1; transform: none; }
   .button:hover { transform: none; }
 }
-@media print { .reveal { opacity: 1; transform: none; } .carousel-controls, .ingredient-tabs { display: none; } .ingredient-panel[hidden] { display: block !important; } }
+/* Quiet, one-shot motion throughout the editorial pages. */
+.editorial-entrance { animation: editorial-arrive 850ms cubic-bezier(.2,.65,.3,1) both; animation-delay: var(--entrance-delay, 0ms); }
+@keyframes editorial-arrive { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.editorial-motion main > section[id] { scroll-margin-top: 115px; }
+.chapter-index { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 28px; padding: 20px var(--gutter); border-block: 1px solid var(--line); background: var(--cream); }
+.chapter-index > span { margin-right: auto; }
+.chapter-index a { font-size: 12px; padding: 10px 0; text-decoration: none; border-bottom: 1px solid transparent; transition: color 220ms, border-color 220ms; }
+.chapter-index a:hover, .chapter-index a[aria-current] { border-bottom-color: currentColor; }
+.editorial-motion .values-grid article, .editorial-motion .ritual-steps article { transition: background-color 350ms, transform 600ms, opacity 700ms; }
+.editorial-motion .contact-form .field { border-radius: 2px; transition: background-color 250ms; }
+.editorial-motion .contact-form .field:focus-within { background: #e9ede4; }
+.editorial-motion .contact-form input, .editorial-motion .contact-form textarea { transition: border-color 250ms, box-shadow 250ms; }
+.editorial-motion details[open] .answer { animation: editorial-arrive 350ms ease-out; }
+.editorial-motion .story-hero-photo, .editorial-motion .ingredient-photo, .editorial-motion .botanical-wide { overflow: hidden; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .editorial-motion .values-grid article:hover, .editorial-motion .ritual-steps article:hover { background-color: #e9ede4; transform: translateY(-4px); }
+  .editorial-motion .story-hero-photo img, .editorial-motion .ingredient-photo img, .editorial-motion .botanical-wide img { transition: transform 1400ms cubic-bezier(.2,.65,.3,1); }
+  .editorial-motion .story-hero-photo:hover img, .editorial-motion .ingredient-photo:hover img, .editorial-motion .botanical-wide:hover img { transform: scale(1.025); }
+}
+@media (max-width: 700px) {
+  .chapter-index { gap: 4px 20px; padding-block: 18px; }
+  .chapter-index > span { flex-basis: 100%; }
+  .chapter-index a { min-height: 44px; display: inline-flex; align-items: center; }
+  .editorial-motion main > section[id] { scroll-margin-top: 90px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .editorial-entrance, .editorial-motion details[open] .answer { animation: none; }
+  .editorial-motion *, .editorial-motion *::before, .editorial-motion *::after { scroll-behavior: auto; transition: none; }
+}
+@media print { .editorial-entrance { animation: none; } .chapter-index { display: none; } .reveal { opacity: 1; transform: none; } .carousel-controls, .ingredient-tabs { display: none; } .ingredient-panel[hidden] { display: block !important; } }

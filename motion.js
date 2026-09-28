@@ -1,6 +1,50 @@
 // Small progressive enhancements. Content remains available without JavaScript.
 (() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const editorialPage = document.body.matches('.page-product, .page-ingredients, .page-about, .page-ritual, .page-contact');
+  // One-shot entrances: no looping motion, scroll hijacking or hidden no-JS content.
+  if (editorialPage) {
+    document.body.classList.add('editorial-motion');
+    document.querySelectorAll('.page-intro > *, .about-hero > *, .story-hero > div > :not(.breadcrumbs), .product-detail-copy > *, .product-detail > .product-frame, .story-hero-photo').forEach((element, index) => {
+      if (reducedMotion.matches || element.getBoundingClientRect().top >= window.innerHeight) return;
+      element.classList.add('editorial-entrance');
+      element.style.setProperty('--entrance-delay', `${Math.min(index, 4) * 70}ms`);
+    });
+    // A real section index keeps long editorial pages easy to explore.
+    const sections = [...document.querySelectorAll('main > section')].filter(section => section.querySelector('h2'));
+    if (sections.length > 1) {
+      const index = document.createElement('nav');
+      index.className = 'chapter-index';
+      index.setAttribute('aria-label', 'On this page');
+      const label = document.createElement('span');
+      label.className = 'eyebrow';
+      label.textContent = 'Explore this page';
+      index.append(label);
+      sections.forEach((section, i) => {
+        if (!section.id) section.id = `chapter-${i + 1}`;
+        const link = document.createElement('a');
+        link.href = `#${section.id}`;
+        const heading = section.querySelector('h2').cloneNode(true);
+        heading.querySelectorAll('br').forEach(br => br.replaceWith(' '));
+        link.textContent = heading.textContent.replace(/\s+/g, ' ').trim();
+        index.append(link);
+      });
+      const firstSection = document.querySelector('main > section');
+      firstSection.after(index);
+      if ('IntersectionObserver' in window) {
+        const visible = new Set();
+        const chapterObserver = new IntersectionObserver(entries => {
+          entries.forEach(entry => entry.isIntersecting ? visible.add(entry.target) : visible.delete(entry.target));
+          const current = sections.find(section => visible.has(section));
+          [...index.querySelectorAll('a')].forEach(link => {
+            if (current && link.hash === `#${current.id}`) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          });
+        }, { rootMargin: '-15% 0px -35% 0px', threshold: 0 });
+        sections.forEach(section => chapterObserver.observe(section));
+      }
+    }
+  }
   const carousel = document.querySelector('[data-carousel]');
 
   if (carousel) {
@@ -105,7 +149,7 @@
 
   // Reveal whole editorial groups once, rather than making every line move.
   if ('IntersectionObserver' in window && !reducedMotion.matches) {
-    const groups = document.querySelectorAll('.editorial-intro > *, .product-feature > *, .section-heading, .ingredient-explorer, .ritual-copy, .faq-section > div, .about-story > *, .values-grid > article, .ritual-steps > article, .ingredient-rows > article, .statement > *, .waitlist > div');
+    const groups = document.querySelectorAll('.editorial-intro > *, .product-feature > *, .section-heading, .ingredient-explorer, .ritual-copy, .faq-section > div, .about-story > *, .values-grid > article, .ritual-steps > article, .ingredient-rows > article, .statement > *, .waitlist > div, .editorial-motion .product-detail-copy > *, .editorial-motion .ingredient-visual > *, .editorial-motion .ingredient-story-intro > *, .editorial-motion .ritual-intro > *, .editorial-motion .founder-note > *, .editorial-motion .wide-photo, .editorial-motion .contact-layout > *, .editorial-motion .note-band > *, .editorial-motion .invite > *');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(({ target, isIntersecting }) => {
         if (!isIntersecting) return;

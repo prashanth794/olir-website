@@ -1,4 +1,4 @@
-// Forms submit directly to Netlify; navigation never intercepts submissions.
+// Accessible navigation and Formspree submission handling.
 document.addEventListener('DOMContentLoaded', () => {
   const menuButton = document.querySelector('.menu-toggle');
   const menu = document.querySelector('dialog#site-menu');
@@ -138,69 +138,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // --- Dynamic Interactions & Animations ---
-
-  // 1. Staggered Scroll Reveals
-  // Automatically add reveal classes to typography and media to animate them individually
-  const revealElements = document.querySelectorAll('main h1, main h2, main h3, main p, main img, main .button, main .text-link');
-  revealElements.forEach(el => el.classList.add('reveal'));
-
-  const observerOptions = {
-    root: null,
-    rootMargin: '0px 0px -10% 0px', // Trigger slightly before it comes into view
-    threshold: 0
-  };
-  const observer = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        obs.unobserve(entry.target);
-      }
-    });
-  }, observerOptions);
-  
-  revealElements.forEach(el => observer.observe(el));
-
-  // 2. Header Scroll Effect (Shrink & Blur)
-  const header = document.querySelector('.site-header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      header.classList.add('header-scrolled');
-    } else {
-      header.classList.remove('header-scrolled');
-    }
-  }, { passive: true });
-
-  // 3. Parallax Images
-  const parallaxImages = document.querySelectorAll('.hero-photo img, .wide-photo img, .ingredient-photo img, .story-hero-photo img');
-  parallaxImages.forEach(img => {
-    // Wrap image for parallax overflow if not already
-    img.style.transform = 'scale(1.1)'; // allow room to scroll
-  });
-
-  window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-    parallaxImages.forEach(img => {
-      const parent = img.closest('figure, div');
-      if (!parent) return;
-      const rect = parent.getBoundingClientRect();
-      // Only animate if in viewport
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
-        const yPos = (rect.top * 0.15); // Adjust speed factor here
-        img.style.transform = `scale(1.15) translateY(${yPos}px)`;
-      }
-    });
-  }, { passive: true });
 });
-
-  // 4. Hero Carousel
-  const slides = document.querySelectorAll('.carousel-slide');
-  if (slides.length > 0) {
-    let currentSlide = 0;
-    setInterval(() => {
-      slides[currentSlide].classList.remove('active');
-      currentSlide = (currentSlide + 1) % slides.length;
-      slides[currentSlide].classList.add('active');
-    }, 6000); // 6 seconds per slide
-  }
-

@@ -24,6 +24,43 @@ const ingredients = [
   ['04', 'Olive oil', 'The familiar oil', 'Olive oil brings a familiar botanical ingredient to the blend, alongside rosemary, tea tree oil and aloe vera essence.'],
 ];
 
+const heroCarousel = `<div class="hero-art" role="region" aria-roledescription="carousel" aria-label="The world of Olir" data-carousel>
+  <div class="hero-carousel">
+    <div class="carousel-slide active" id="olir-slide-1" role="group" aria-roledescription="slide" aria-label="1 of 3: A little space for you" data-caption="A little space for you.">
+      <picture><source media="(max-width: 700px)" srcset="assets/olir-front-portrait-mobile.webp"><img src="assets/olir-front-portrait.webp" width="1024" height="1536" alt="A woman facing the camera with a relaxed smile and long wavy hair in a sunlit garden" fetchpriority="high" decoding="async"></picture>
+    </div>
+    <div class="carousel-slide" id="olir-slide-2" role="group" aria-roledescription="slide" aria-label="2 of 3: Rooted in nature" aria-hidden="true" data-caption="Rooted in nature.">
+      <img src="assets/carousel-herbs.jpg" width="1376" height="768" alt="Botanical ingredients arranged in soft natural light" decoding="async">
+    </div>
+    <div class="carousel-slide" id="olir-slide-3" role="group" aria-roledescription="slide" aria-label="3 of 3: The everyday, a little more unhurried" aria-hidden="true" data-caption="The everyday, a little more unhurried.">
+      <img src="assets/carousel-oil.jpg" width="1376" height="768" alt="An editorial still life of botanical hair oil" decoding="async">
+    </div>
+  </div>
+  <div class="carousel-footer">
+    <div class="carousel-note"><span class="eyebrow">The Olir edit</span><span data-carousel-caption>A little space for you.</span></div>
+    <div class="carousel-controls" hidden>
+      <div class="carousel-selectors" role="group" aria-label="Choose an image">
+        <button type="button" class="carousel-select is-current" aria-label="Show portrait" aria-controls="olir-slide-1" aria-pressed="true"><span>01</span></button>
+        <button type="button" class="carousel-select" aria-label="Show botanicals" aria-controls="olir-slide-2" aria-pressed="false"><span>02</span></button>
+        <button type="button" class="carousel-select" aria-label="Show hair oil" aria-controls="olir-slide-3" aria-pressed="false"><span>03</span></button>
+      </div>
+      <button type="button" class="carousel-toggle" data-carousel-toggle aria-label="Pause slideshow"><span aria-hidden="true">Ⅱ</span></button>
+    </div>
+  </div>
+</div>`;
+const ingredientExplorer = `<div class="ingredient-explorer" data-ingredient-explorer>
+  <div class="explorer-photo">${botanicals()}</div>
+  <div class="explorer-content">
+    <p class="eyebrow">Four ingredients. One beginning.</p>
+    <div class="ingredient-tabs" role="tablist" aria-label="Explore the sample ingredients" hidden>
+      ${ingredients.map(([n,name],i)=>`<button type="button" role="tab" id="botanical-tab-${n}" aria-controls="botanical-panel-${n}" aria-selected="${i===0}" tabindex="${i===0?'0':'-1'}"><span class="ingredient-tab-number">${n}</span>${name}</button>`).join('')}
+    </div>
+    <div class="ingredient-panels">
+      ${ingredients.map(([n,name,sub,desc])=>`<div class="ingredient-panel" id="botanical-panel-${n}" data-ingredient-panel><p class="eyebrow">${sub}</p><h3>${name}</h3><p>${desc}</p><a class="text-link" href="ingredients.html#ingredient-${n}">Take a closer look ${arrow}</a></div>`).join('')}
+    </div>
+  </div>
+</div>`;
+
 export const pages = [
   {
     slug: '404', title: 'A little detour — Olir', noindex: true,
@@ -33,11 +70,11 @@ export const pages = [
   {
     slug: 'index', title: 'Olir — Botanical hair care. A little space for you.',
     description: 'Meet Olir, a botanical hair oil in development for your everyday ritual. Discover the ingredients and join the first-release list.',
-    body: `<section class="hero"><div class="hero-copy"><p class="eyebrow">Botanical hair care · Coming soon</p><h1>A little ritual.<br>A deeper kind<br>of <em>care.</em></h1><p>From scalp to strands, a moment that belongs to you. Meet the first hair oil from Olir.</p><div class="hero-actions"><a class="button button-light" href="product.html">Discover the hair oil ${arrow}</a><a class="quiet-link" href="#waitlist">Join the first release</a></div><span class="hero-footnote">Rooted in nature. Made for your everyday.</span></div><div class="hero-art"><div class="hero-carousel"><div class="carousel-slide active" style="background-image: url('assets/carousel-hair.jpg');"></div><div class="carousel-slide" style="background-image: url('assets/carousel-herbs.jpg');"></div><div class="carousel-slide" style="background-image: url('assets/carousel-oil.jpg');"></div></div><span class="image-caption">The everyday, a little more unhurried.</span></div></section>
+    body: `<section class="hero"><div class="hero-copy"><p class="eyebrow">Botanical hair care · Coming soon</p><h1>A little ritual.<br>A deeper kind<br>of <em>care.</em></h1><p>From scalp to strands, a moment that belongs to you. Meet the first hair oil from Olir.</p><div class="hero-actions"><a class="button button-light" href="product.html">Discover the hair oil ${arrow}</a><a class="quiet-link" href="#waitlist">Join the first release</a></div><span class="hero-footnote">Rooted in nature. Made for your everyday.</span></div>${heroCarousel}</section>
     <div class="brand-strip"><span>Botanical ingredients</span><span>Scalp-to-strand rituals</span><span>A new Australian chapter</span></div>
     <section class="editorial-intro section"><p class="eyebrow">The Olir philosophy</p><h2>Good things begin<br>with <em>a little care.</em></h2><div><p>We believe the small things deserve our attention. The ingredients we choose. The routines we return to. The quiet pleasure of making time for yourself.</p><a href="about.html" class="text-link">Our story ${arrow}</a></div></section>
     <section class="product-feature"><figure class="product-frame">${bottle()}<figcaption>The first sample · Styled for Olir</figcaption></figure><div class="product-feature-copy"><p class="eyebrow">Introducing · Our first release</p><h2>Meet your<br><em>root ritual.</em></h2><p class="product-name">The Olir Hair Oil</p><p>A botanical blend with rosemary, tea tree oil, aloe vera essence and olive oil. One product to begin. A little more care in your day.</p><div class="ingredient-tags"><span>Rosemary</span><span>Tea tree oil</span><span>Aloe vera essence</span><span>Olive oil</span></div><div class="release-line"><span>In development</span><span>First release coming soon</span></div><a href="product.html" class="button">Explore the hair oil ${arrow}</a><p class="fineprint">Join the waitlist for size, price and launch details.</p></div></section>
-    <section class="ingredient-edit section"><div class="section-heading"><div><p class="eyebrow">Inside the first blend</p><h2>Familiar botanicals.<br><em>A fresh beginning.</em></h2></div><a href="ingredients.html" class="text-link">Meet the ingredients ${arrow}</a></div><div class="botanical-list">${ingredients.map(([n,name,sub])=>`<a href="ingredients.html#ingredient-${n}" class="botanical-item"><span class="eyebrow">${n} / ${sub}</span><h3>${name}</h3><span class="botanical-arrow" aria-hidden="true">↗</span></a>`).join('')}</div></section>
+    <section class="ingredient-edit section"><div class="section-heading"><div><p class="eyebrow">Inside the first blend</p><h2>Familiar botanicals.<br><em>A fresh beginning.</em></h2></div><a href="ingredients.html" class="text-link">Meet the ingredients ${arrow}</a></div>${ingredientExplorer}</section>
     <section class="ritual-feature">${mortar('ritual-photo')}<div class="ritual-copy"><p class="eyebrow">The art of slowing down</p><h2>A few minutes.<br><em>All yours.</em></h2><p>A quiet morning. A pause at the end of the day. Hair care can be a small way of coming back to yourself.</p><a class="text-link" href="ritual.html">Discover the Olir ritual ${arrow}</a></div></section>
     <section class="faq-section section"><div><p class="eyebrow">A little clarity</p><h2>Before we<br><em>begin.</em></h2><a href="faq.html" class="text-link">All your questions ${arrow}</a></div>${faq(3)}</section>${waitlist}`,
   },

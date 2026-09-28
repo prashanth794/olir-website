@@ -579,7 +579,7 @@ section[id], article[id] { scroll-margin-top: 112px; }
   transform: translateY(20px);
   transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.reveal.is-visible {
+.reveal.is-visible, .reveal:focus-within {
   opacity: 1;
   transform: translateY(0);
 }
@@ -858,55 +858,99 @@ details[open]::details-content {
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* Dynamic Animations & Carousel */
+/* Quiet motion: small movements, generous pauses, visitor-controlled playback. */
 .button {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease;
+  transition: transform .35s ease, background-color .3s ease, color .3s ease, box-shadow .35s ease;
 }
 .button:hover {
-  transform: scale(1.025);
-  box-shadow: 0 10px 20px -10px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px -12px rgba(25,44,35,.3);
 }
 .text-link {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity .3s ease;
 }
 .text-link span {
   display: inline-block;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform .4s ease;
 }
 .text-link:hover span {
-  transform: translateX(4px);
+  transform: translate(3px, -2px);
 }
 .hero-carousel {
   position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
+  inset: 0;
   overflow: hidden;
-  background: var(--neutral);
+  background: var(--sage-deep);
 }
 .carousel-slide {
   position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-size: cover;
-  background-position: center;
+  inset: 0;
   opacity: 0;
-  transition: opacity 1.2s ease-in-out;
-  will-change: transform, opacity;
+  transition: opacity 1.35s ease-in-out;
+  pointer-events: none;
 }
-.carousel-slide.active {
-  opacity: 1;
-  animation: kenburns 12s linear forwards;
-}
-@keyframes kenburns {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.08); }
-}
+.carousel-slide.active { opacity: 1; z-index: 1; }
+.carousel-slide picture, .carousel-slide img { width: 100%; height: 100%; }
+.carousel-slide img { object-fit: cover; object-position: center; }
+.carousel-slide:first-child img { object-position: center top; transform-origin: center 25%; }
+.carousel-slide.active img { animation: olir-drift 10s ease-out both; animation-play-state: paused; }
+.hero-art[data-playing="true"] .carousel-slide.active img { animation-play-state: running; }
+@keyframes olir-drift { from { transform: scale(1); } to { transform: scale(1.035); } }
+.carousel-footer { position: absolute; inset: auto 0 0; z-index: 2; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 72px 30px 26px; background: linear-gradient(transparent, rgba(19,34,26,.76)); color: #fffdf8; pointer-events: none; }
+.carousel-note { display: grid; gap: 6px; max-width: 260px; font-size: 14px; line-height: 1.5; }
+.carousel-note .eyebrow { font-size: 9px; letter-spacing: .16em; }
+.carousel-controls { display: flex; align-items: center; gap: 8px; pointer-events: auto; }
+.carousel-selectors { display: flex; gap: 2px; }
+.carousel-select, .carousel-toggle { border: 0; background: transparent; color: inherit; min-width: 44px; min-height: 44px; padding: 8px; font-family: var(--mono); font-size: 11px; position: relative; }
+.carousel-select::after { content: ''; position: absolute; left: 8px; right: 8px; bottom: 3px; height: 1px; background: currentColor; opacity: .4; transition: height .25s, opacity .25s; }
+.carousel-select.is-current::after { height: 3px; opacity: 1; }
+.carousel-select:hover, .carousel-toggle:hover { background: rgba(255,255,255,.12); }
+.carousel-toggle { border: 1px solid rgba(255,255,255,.5); border-radius: 50%; margin-left: 4px; font-size: 16px; line-height: 1; }
+.carousel-controls :focus-visible { outline-color: white; outline-offset: 3px; }
 
-/* Ambient site movement */
-@keyframes ambient-float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0px); }
-}
-.product-frame img, .ingredient-photo img, .story-hero-photo img, .ritual-photo img {
-  animation: ambient-float 8s ease-in-out infinite;
-}
+/* Explore the ingredients without leaving the story. */
+.ingredient-explorer { display: grid; grid-template-columns: 1fr 1fr; background: var(--sage); border: 1px solid var(--line); }
+.explorer-photo { min-height: 510px; overflow: hidden; }
+.explorer-photo picture, .explorer-photo img { width: 100%; height: 100%; }
+.explorer-photo img { object-fit: cover; }
+.explorer-content { align-self: center; padding: clamp(28px, 4vw, 62px); }
+.ingredient-tabs { display: grid; grid-template-columns: 1fr 1fr; margin: 24px 0 32px; gap: 0 18px; }
+.ingredient-tabs button { display: flex; align-items: center; gap: 9px; text-align: left; padding: 14px 0; min-height: 52px; font-size: 12px; border: 0; border-bottom: 1px solid #b5c0aa; background: transparent; color: #59664f; transition: color .25s, border-color .25s; }
+.ingredient-tab-number { font-family: var(--mono); font-size: 10px; opacity: .7; }
+.ingredient-tabs button[aria-selected="true"] { color: var(--forest); border-bottom: 2px solid var(--forest); font-weight: 600; }
+.ingredient-tabs button:hover { color: var(--forest); }
+.ingredient-panel + .ingredient-panel { margin-top: 28px; }
+.is-enhanced .ingredient-panel { margin-top: 0; min-height: 232px; animation: botanical-enter .4s ease-out both; }
+.ingredient-panel h3 { margin: 14px 0 18px; font-size: clamp(32px, 3vw, 46px); }
+.ingredient-panel > p:not(.eyebrow) { color: #53604d; font-size: 14px; line-height: 1.85; max-width: 380px; }
+.ingredient-panel .text-link { margin-top: 24px; }
+@keyframes botanical-enter { from { opacity: .3; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+.site-header.header-scrolled { padding-top: 15px; padding-bottom: 19px; min-height: 94px; }
+.site-header.header-scrolled .wordmark { font-size: 59px; }
 
+@media (max-width: 999px) {
+  .ingredient-explorer { grid-template-columns: .9fr 1.1fr; }
+  .explorer-content { padding: 28px; }
+  .carousel-footer { padding: 60px 20px 20px; flex-wrap: wrap; gap: 12px; }
+  .carousel-note { max-width: none; }
+  .site-header.header-scrolled { min-height: 82px; padding-top: 13px; padding-bottom: 15px; }
+  .site-header.header-scrolled .wordmark { font-size: 52px; }
+}
+@media (max-width: 700px) {
+  .ingredient-explorer { grid-template-columns: 1fr; }
+  .explorer-photo { min-height: 0; height: 74vw; max-height: 370px; }
+  .explorer-content { padding: 30px 24px; }
+  .ingredient-tabs { margin-bottom: 26px; }
+  .is-enhanced .ingredient-panel { min-height: 246px; }
+  .carousel-footer { padding: 60px 22px 22px; }
+  .carousel-note { width: 100%; font-size: 13px; }
+  .carousel-controls { width: 100%; justify-content: space-between; }
+  .carousel-selectors { gap: 8px; }
+  .site-header.header-scrolled { min-height: 76px; padding-top: 10px; padding-bottom: 13px; }
+  .site-header.header-scrolled .wordmark { font-size: 49px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
+  .button:hover { transform: none; }
+}
+@media print { .reveal { opacity: 1; transform: none; } .carousel-controls, .ingredient-tabs { display: none; } .ingredient-panel[hidden] { display: block !important; } }
